@@ -8,11 +8,7 @@ var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var moviesRouter = require('./routes/movies');
 
-var app = express();
-
-//ADDING MONGOOSE ??
-
-//Connecting DataBase ??
+var app = express();  
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));

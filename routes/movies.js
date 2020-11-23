@@ -1,3 +1,8 @@
+//Note pour professeur : J'ai écrit le code mais
+// je n'ai pas réussi à prendre en main Postman
+// donc je n'ai pas pu tester mes routes put, get, post et delete
+// un message d'erreur s'affichait à chaque fois dans la partie "headers" du Postman
+
 const express = require('express');
 const router = express.Router();
 
@@ -11,23 +16,20 @@ const axios = require('axios')
 const API_URL = 'http://www.omdbapi.com';
 const API_KEY = '67f90c98';
 
-// quoi mettre / ou /:movies ??
-//faire npm i -s axios
-
 // Create raw data array
 let movies = [{
-    id: '1',
-    movie: 'Pirates of the Caribbean',
-    yearOfRelease: '2000',
-    duration: '200', // en minutes
-    actors: ['Johnny Depp', 'Orlando Bloom'],
+    id: '0',
+    movie: 'Movie',
+    yearOfRelease: 'YearOfRelease',
+    duration: 'Duration', // en minutes
+    actors: ['Actor1', 'Actor2'],
     poster: 'img_default', // lien vers une image d'affiche,
-    boxOffice: '300 000 000', // en USD$
-    rottenTomatoesScore: '98'
+    boxOffice: 'BoxOffice', // en USD$
+    rottenTomatoesScore: 'Tomatoes'
 }];
 
 /*Create a movie / PUT a movie*/
-router.put('/:movieName', (req, res) => {
+router.put('/', (req, res) => {
     // Get name for the new movie from the body of the request
     const { movieName } = req.body;
     // Create new unique id
@@ -36,7 +38,7 @@ router.put('/:movieName', (req, res) => {
     //We use the axios.get because we want 
     //to get the data from the API and add it into our DB
     //and not adding a movie to the API (would be : axios.put)
-    axios.get('${API_URL}?t={movieName}&apikey=${API_KEY}').then((response) => {
+    axios.get(`${API_URL}?t=${movieName}&apikey=${API_KEY}`).then((response) => {
     //Insert in Array
     movies.push({ 
         id: id,
@@ -47,19 +49,18 @@ router.put('/:movieName', (req, res) => {
         poster: response.data.Poster,
         BoxOffice: response.data.BoxOffice,
         rottenTomatoesScore: response.data.Ratings[1].Value
-    });
-
-    }).catch(error => {
+        });
+    })
+    .catch(error => {
         // Handle error
         console.log(error);
-    
-    }).then(() => {
+    })
+    .then(() => {
          //Return message
         res.json({
         message: 'Just added ${movieName}',
+    })
     });
-    });
-
 });
   
 /*GET all movies (listing). */
@@ -69,7 +70,7 @@ router.get('/movies', (req, res) => {
 });
 
 /*GET one movie. */
-router.get('/movies/:id', (req, res) => {
+router.get('/:id', (req, res) => {
     // Get id in params
     const { id } = req.params;
     // Find movie in Database
@@ -95,7 +96,7 @@ router.post('/:id', (req, res) => {
     const movieToUpdate = _.find(movies, ["id", id]);
     //API
     // Update all data with the new data    
-    axios.get('${API_URL}?t={movieToUpdate.movie}&apikey=${API_KEY}').then((response) => {
+    axios.get(`${API_URL}?t={movieToUpdate.movie}&apikey=${API_KEY}`).then((response) => {
         movieToUpdate.movie = movieNewName;
         movieToUpdate.yearOfRelease = response.data.Year;
         movieToUpdate.duration= response.data.Runtime;
@@ -103,17 +104,14 @@ router.post('/:id', (req, res) => {
         movieToUpdate.poster = response.data.Poster;
         movieToUpdate.BoxOffice = response.data.BoxOffice;
         movieToUpdate.rottenTomatoesScore= response.data.Ratings[1].Value
-    
-    }).catch(error => {
+    })
+    .catch(error => {
         console.log(error);
-
-    }).then(() => {
+    })
+    .then(() => {
         // Return message
-        res.json({
-        message: 'Just updated ${id} with ${movie}',
-        movieToUpdate
+        res.json({ message: 'Just updated ${id} with ${movie}', movieToUpdate });
     });
-
 });
   
 /*DELETE movie */
